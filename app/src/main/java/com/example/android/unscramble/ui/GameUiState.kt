@@ -60,11 +60,14 @@ class GameUiState(
     }
 
     fun checkUserGuess(): GameUiState {
-        return if (isGuessedWordCorrectOrAbsent()) {
-            updateGameState(score.plus(SCORE_INCREASE))
-        } else {
-            updateUserGuess(null)
-        }
+        return if (userGuess == null) {
+            this
+        } else
+            if (isGuessedWordCorrectOrAbsent()) {
+                updateGameState(score.plus(SCORE_INCREASE))
+            } else {
+                updateUserGuess(null)
+            }
     }
 
     fun skipWord(): GameUiState {
