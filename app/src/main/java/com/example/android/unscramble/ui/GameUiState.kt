@@ -77,7 +77,7 @@ class GameUiState(
                 updateUserGuess(null).let {
                     GameUiState(
                         currentWordState = it.currentWordState,
-                        currentWordCount = it.currentWordCount,
+                        currentWordCount = it.currentWordCount, // Not increment currentWordCount?
                         score = it.score,
                         userGuess = it.userGuess,
                         justMadeGuess = true
@@ -87,12 +87,6 @@ class GameUiState(
     }
 
     fun skipWord(): GameUiState {
-        return GameUiState(
-            currentWordState = currentWordState.next(),
-            currentWordCount = currentWordCount,
-            score = score,
-            userGuess = null,
-            justMadeGuess = false
-        )
+        return updateGameState(score)
     }
 }
