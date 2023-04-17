@@ -4,11 +4,13 @@ import com.example.android.unscramble.data.MAX_NO_OF_WORDS
 import com.example.android.unscramble.data.SCORE_INCREASE
 
 // TODO Move this immutable data model (that functionally updates itself during the game) out of this package
+// Not all of it, but most of it. Only partially filled in guesses really belong to the UI-specific model.
 class GameUiState(
     val currentWordState: CurrentWordState,
     val currentWordCount: Int,
     val score: Int,
-    val userGuess: String?
+    val userGuess: String?,
+    val justMadeGuess: Boolean
 ) {
     companion object {
 
@@ -17,7 +19,8 @@ class GameUiState(
                 CurrentWordState.make(),
                 currentWordCount = 1,
                 score = 0,
-                userGuess = null
+                userGuess = null,
+                justMadeGuess = false
             )
         }
     }
@@ -27,7 +30,8 @@ class GameUiState(
             currentWordState = currentWordState.next(),
             currentWordCount = currentWordCount.inc(),
             score = updatedScore,
-            userGuess = null
+            userGuess = null,
+            justMadeGuess = false
         )
     }
 
@@ -35,15 +39,18 @@ class GameUiState(
 
     fun isGameOver(): Boolean = currentWordState.usedWords.size > MAX_NO_OF_WORDS
 
-    fun isGuessedWordCorrectOrAbsent(): Boolean {
-        return userGuess == null || userGuess.equals(
+    fun isGuessedWordCorrect(): Boolean {
+        return userGuess != null && userGuess.equals(
             currentWordState.currentWord,
             ignoreCase = true
         )
     }
 
     fun isGuessedWordWrong(): Boolean {
-        return !isGuessedWordCorrectOrAbsent()
+        return userGuess != null && !userGuess.equals(
+            currentWordState.currentWord,
+            ignoreCase = true
+        )
     }
 
     fun resetGame(): GameUiState {
@@ -55,7 +62,8 @@ class GameUiState(
             currentWordState = currentWordState,
             currentWordCount = currentWordCount,
             score = score,
-            userGuess = guessedWord
+            userGuess = guessedWord,
+            justMadeGuess = false
         )
     }
 
@@ -63,10 +71,18 @@ class GameUiState(
         return if (userGuess == null) {
             this
         } else
-            if (isGuessedWordCorrectOrAbsent()) {
+            if (isGuessedWordCorrect()) {
                 updateGameState(score.plus(SCORE_INCREASE))
             } else {
-                updateUserGuess(null)
+                updateUserGuess(null).let {
+                    GameUiState(
+                        currentWordState = it.currentWordState,
+                        currentWordCount = it.currentWordCount,
+                        score = it.score,
+                        userGuess = it.userGuess,
+                        justMadeGuess = true
+                    )
+                }
             }
     }
 
@@ -75,7 +91,8 @@ class GameUiState(
             currentWordState = currentWordState.next(),
             currentWordCount = currentWordCount,
             score = score,
-            userGuess = null
+            userGuess = null,
+            justMadeGuess = false
         )
     }
 }
