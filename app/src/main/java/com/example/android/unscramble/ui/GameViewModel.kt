@@ -17,12 +17,12 @@ class GameViewModel : ViewModel() {
         _uiState.updateAndGet { it.resetGame() }
     }
 
-    fun updateUserGuess(guessedWord: String) {
-        _uiState.updateAndGet { it.updateUserGuess(guessedWord) }
+    fun updatePartialUserGuess(partiallyGuessedWord: String) {
+        _uiState.updateAndGet { it.updatePartialUserGuess(partiallyGuessedWord) }
     }
 
-    fun checkUserGuess() {
-        _uiState.updateAndGet { it.checkUserGuess() }
+    fun updateAndCheckUserGuess(guessedWord: String) {
+        _uiState.updateAndGet { it.updateUserGuess(guessedWord).checkUserGuess() }
     }
 
     fun skipWord() {

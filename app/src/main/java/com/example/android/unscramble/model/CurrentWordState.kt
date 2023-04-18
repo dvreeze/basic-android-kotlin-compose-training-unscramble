@@ -1,29 +1,32 @@
-package com.example.android.unscramble.ui
-
-import com.example.android.unscramble.data.allWords
+package com.example.android.unscramble.model
 
 class CurrentWordState private constructor(
+    val allWords: Set<String>,
     val usedWords: Set<String>,
     val currentScrambledWord: String,
     val currentWord: String
 ) {
     companion object {
 
-        fun make(): CurrentWordState {
-            return next(emptySet())
+        fun make(allWords: Set<String>): CurrentWordState {
+            return next(emptySet(), allWords)
         }
 
-        fun next(usedWords: Set<String>): CurrentWordState {
-            return pickRandomWordAndShuffle(usedWords)
+        fun next(usedWords: Set<String>, allWords: Set<String>): CurrentWordState {
+            return pickRandomWordAndShuffle(usedWords, allWords)
         }
 
-        private fun pickRandomWordAndShuffle(usedWords: Set<String>): CurrentWordState {
+        private fun pickRandomWordAndShuffle(
+            usedWords: Set<String>,
+            allWords: Set<String>
+        ): CurrentWordState {
             val currentWord = allWords.random()
 
             return if (usedWords.contains(currentWord)) {
-                pickRandomWordAndShuffle(usedWords)
+                pickRandomWordAndShuffle(usedWords, allWords)
             } else {
                 CurrentWordState(
+                    allWords = allWords,
                     usedWords = usedWords.plus(currentWord),
                     currentScrambledWord = shuffleWord(currentWord),
                     currentWord = currentWord
@@ -42,6 +45,6 @@ class CurrentWordState private constructor(
     }
 
     fun next(): CurrentWordState {
-        return next(usedWords)
+        return next(usedWords, allWords)
     }
 }

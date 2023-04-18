@@ -63,15 +63,15 @@ fun GameScreen(
     ) {
 
         GameStatus(
-            wordCount = gameUiState.currentWordCount,
-            score = gameUiState.score
+            wordCount = gameUiState.gameState.currentWordCount,
+            score = gameUiState.gameState.score
         )
         GameLayout(
-            currentScrambledWord = gameUiState.currentWordState.currentScrambledWord,
-            userGuess = gameUiState.nonNullUserGuess(),
-            isGuessWrong = gameUiState.justMadeGuess && gameUiState.isGuessedWordWrong(),
-            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
-            onKeyboardDone = { gameViewModel.checkUserGuess() }
+            currentScrambledWord = gameUiState.gameState.currentWordState.currentScrambledWord,
+            userGuess = gameUiState.partialUserGuess,
+            isGuessWrong = gameUiState.guessJustMade && gameUiState.isGuessedWordWrong(),
+            onUserGuessChanged = { gameViewModel.updatePartialUserGuess(it) },
+            onKeyboardDone = { gameViewModel.updateAndCheckUserGuess(gameUiState.partialUserGuess) }
         )
         Row(
             modifier = modifier
@@ -93,14 +93,14 @@ fun GameScreen(
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(start = 8.dp),
-                onClick = { gameViewModel.checkUserGuess() }
+                onClick = { gameViewModel.updateAndCheckUserGuess(gameUiState.partialUserGuess) }
             ) {
                 Text(stringResource(R.string.submit))
             }
         }
         if (gameUiState.isGameOver()) {
             FinalScoreDialog(
-                score = gameUiState.score,
+                score = gameUiState.gameState.score,
                 onPlayAgain = { gameViewModel.resetGame() }
             )
         }
